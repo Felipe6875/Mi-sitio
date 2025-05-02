@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simplificación de Raíces</title>
+    <style>
+        :root { /*Define los valores a usar más adelante para permitir usar el darkmode */
+        --main-bg: #feca50;
+        --main-color: black;
+        --container-bg: #DFCBA3;
+        --container-color: #000;
+        --container-border: 2px solid #fec759;
+        --input-bg: white;
+        --input-text: black;
+        --input-border: #f9c04e;
+        --button-bg:#FFB607;
+        --button-hover: #d8b05f;
+        --sidebar-bg: #fccf66;
+        --sidebar-button: #eca707;
+        --sidebar-button-hover: #DFCBA3;
+        --sidebar-border: #f9c04e;
+        --sidebar-btn-border: #e1a71f;
+        --sidebar-text: black;
+        --dark-toggle-bg: #333;
+        --dark-toggle-hover: #555;
+        --toggle-btn:#eca707;
+        }
+        body.dark-mode {
+        --main-bg: #121212;
+        --main-color: #e0e0e0;
+        --container-bg: #1e1e1e;
+        --container-color: #e0e0e0;
+        --container-border: 2px solid #555;
+        --input-bg: #1e1e1e;
+        --input-text: white;
+        --input-border: #ff3939;
+        --button-bg: #ff3939;
+        --button-hover: #444;
+        --sidebar-bg: #1f1f1f;
+        --sidebar-button: #ff3939;
+        --sidebar-button-hover: #fb6666;
+        --sidebar-border: #555;
+        --sidebar-btn-border: #535353;
+        --sidebar-text: white;
+        --dark-toggle-bg: #eca707;
+        --dark-toggle-hover:#f2c762;
+        --toggle-btn:#555;
+        }
+        body {
+        font-family: 'Arial', sans-serif;
+        background: var(--main-bg);
+        color: var(--main-color);
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        transition: background 0.3s ease, color 0.3s ease;
+        }
+        .container {
+        background: var(--container-bg);
+        color: var(--container-color);
+        padding: 30px;
+        border-radius: 15px;
+        border: var(--container-border);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        max-width: 400px;
+        text-align: center;
+        margin-left: 20px;
+        transition: margin-left 0.3s;
+        z-index: 0;
+        }
+        .container.shift {
+        margin-left: 220px;
+        }
+        h2 {
+        margin-bottom: 15px;
+        }
+        .input-group {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        }
+        input {
+        width: 60px;
+        padding: 5px;
+        font-size: 18px;
+        border: 2px solid var(--input-border);
+        border-radius: 5px;
+        text-align: center;
+        background-color: var(--input-bg);
+        color: var(--input-text);
+        }
+        button {
+        background: var(--button-bg);
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+        }
+        button:hover {
+        background: var(--button-hover);
+        }
+        .sidebar {
+        position: fixed;
+        left: -238px;
+        top: 0;
+        width: 200px;
+        height: 100%;
+        background: var(--sidebar-bg);
+        color: var(--sidebar-text);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: left 0.3s;
+        z-index: 1000;
+        overflow-y: auto;
+        }
+        .sidebar.open {
+        left: 0;
+        border-right: 2.7px solid var(--sidebar-border);
+        }
+        .sidebar ul {
+        list-style: none;
+        padding: 0;
+        width: 100%;
+        }
+        .sidebar a {
+        width: 100%;
+        text-align: left;
+        }
+        .sidebar button {
+        width: 100%;
+        padding: 10px;
+        background: var(--sidebar-button);
+        color: white;
+        text-align: center;
+        border: 1.7px solid var(--sidebar-btn-border);
+        cursor: pointer;
+        transition: background 0.3s;
+        margin-bottom: 1.8px;
+        border:1.7px solid var(--sidebar-btn-border);
+        }
+        .sidebar button:hover {
+        background: var(--sidebar-button-hover);
+        }
+        .sidebar h2{
+        text-align: center;
+        padding-bottom: 8px;
+        width: 100%;
+        margin-top: 1px; 
+        margin-bottom: 30px;
+        border-bottom: 3px solid var(--sidebar-btn-border);
+        }
+        .sidebar h3{
+        margin-top: 1px; 
+        margin-bottom: 0.01px;
+        }
+        .toggle-btn {
+        position: fixed;
+        left: 5px;
+        top: 5px;
+        background: var(--toggle-btn);
+        color: white;
+        border: none;
+        padding: 6px 10px;
+        font-size: 20px;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: left 0.3s, background 0.3s;
+        white-space: nowrap;
+        width: 40px;
+        height: auto;
+        min-width: 40px;
+        max-width: 40px;
+        text-align: center;
+        z-index: 1100;
+        }
+        .sidebar .toggle-btn {
+        font-size: 20px;
+        background: var(--toggle-btn);
+        }
+        .sidebar.open .toggle-btn {
+        left: 243px;
+        }
+        .dark-mode-toggle {
+        position: fixed;
+        top: 5px;
+        right: 3.8px;
+        color: white;
+        background-color: var(--dark-toggle-bg);
+        border: none;
+        padding: 8px 12px;
+        font-size: 18px;
+        cursor: pointer;
+        z-index: 1100;
+        transition: background 0.3s;
+        }
+        .dark-mode-toggle:hover {
+        background: var(--dark-toggle-hover);
+        }
+        .root-display {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-top: 10px;
+        }
+        .index {
+        font-size: 18px;
+        position: relative;
+        top: -10px;
+        left: 10px;
+        }
+        .radical {
+        width: 40px;
+        height: 40px;
+        }
+        .output {
+        margin-top: 15px;
+        font-size: 22px;
+        font-weight: bold;
+        color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <button class="toggle-btn" onclick="toggleMenu()">☰</button>
+        <h2 style="color: var(--sidebar-text);">Menú</h2>
+        <h3>Utilidades</h3>
+        <ul>
+        <a href="main.html"><button>Simplificación de Raíces</button></a>
+        <a href="fraccion.html"><button>Simplificación de Fracciones</button></a>
+        </ul>
+        <h3>Teoría</h3>
+        <ul>
+        <a><button>Leyes de las raíces</button></a>
+        <a><button>Leyes de Fracciones</button></a>
+        </ul>
+        <h3>Juegos</h3>
+        <ul>
+        <a href="numberele.html"><button>Numberele</button></a>
+        <a><button>Quiz</button></a>
+        </ul>
+    </div>
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
+    <div class="container" id="container">
+        <h2>Simplificación de Raíces</h2>
+        <div class="input-group">
+            <input type="number" id="indice" value="2" min="1" placeholder="Índice">
+            <input type="number" id="radicando" value="4" min="1" placeholder="Radicando">
+            <button onclick="simplificarRaiz()">Simplificar</button>
+        </div>
+        <div class="root-display">
+            <span class="index" id="mostrarIndice">2</span>
+            <img src="https://cdn-icons-png.flaticon.com/512/43/43743.png" class="radical">
+            <span id="mostrarRadicando">4</span>
+        </div>
+        <div class="output" id="resultado"></div>
+    </div>
+
+    <script>
+        function simplificarRaiz() {
+            let n = parseInt(document.getElementById('indice').value);
+            let a = parseInt(document.getElementById('radicando').value);
+            if (isNaN(n) || isNaN(a) || n < 1 || a < 1) {
+                document.getElementById("resultado").innerHTML = "Ingresa valores válidos.";
+                return;
+            }
+            document.getElementById('mostrarIndice').textContent = n;
+            document.getElementById('mostrarRadicando').textContent = a;
+            
+            let externo = 1;
+            let interno = a;
+            
+            for (let i = 2; i * i <= interno; i++) {
+                while (interno % (i ** n) === 0) {
+                    interno /= i ** n;
+                    externo *= i;
+                }
+            }
+            
+            let resultado;
+            if (interno === 1) {
+                resultado = `= ${externo}`;
+            } else {
+                resultado = externo > 1 
+                    ? `= ${externo}√${interno}` 
+                    : `√${interno}`;
+            }
+            
+            document.getElementById('resultado').innerHTML = resultado;
+        }
+
+        function toggleMenu() {
+            let sidebar = document.getElementById("sidebar");
+            let container = document.querySelector(".container");
+            if (sidebar.classList.contains("open")) {
+                sidebar.classList.remove("open");
+                container.classList.remove("shift");
+            } else {
+                sidebar.classList.add("open");
+                container.classList.add("shift");
+            }
+        }
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark-mode");
+        }
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                simplificarRaiz();
+            }
+        });
+    </script>
+</body>
+</html>
