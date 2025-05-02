@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Numberle - Adivina el número</title>
+    <style>
+        :root {
+        --bg-color: #feca50;
+        --container-text: black;
+        --text-color: black;
+        --input-bg: white;
+        --input-border: #f9c04e;
+        --input-text: black;
+        --button-bg: #FFB607;
+        --button-hover: #d8b05f;
+        --output-color: black;
+        --fraction-border: white;
+        --sidebar-bg: #fccf66;
+        --sidebar-button-bg: #eca707;
+        --sidebar-button-hover: #DFCBA3;
+        --sidebar-border: #f9c04e;
+        --sidebar-btn-border: #e1a71f;
+        --dark-toggle-bg: #333;
+        --dark-toggle-hover: #555;
+        --toggle-btn: #eca707;
+        }
+        .dark-mode {
+        --bg-color: #121212;
+        --container-text: white;
+        --text-color: #e0e0e0;
+        --container-bg: #1e1e1e;
+        --container-text: #f1f1f1;
+        --container-border: 2px solid #555;
+        --input-bg: white;
+        --input-text: white;
+        --input-border: #ff3939;
+        --button-bg: #ff3939;
+        --button-hover: #444;
+        --output-color: #ff3939;
+        --fraction-border: white;
+        --sidebar-bg: #1f1f1f;
+        --sidebar-button-bg: #ff3939;
+        --sidebar-button-hover: #fb6666;
+        --sidebar-border: #555;
+        --sidebar-btn-border: #535353;
+        --dark-toggle-bg: #eca707;
+        --dark-toggle-hover:#f2c762;
+        --toggle-btn: #555;
+        }
+        body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background-color: var(--bg-color);
+        margin: 0;
+        padding: 0;
+        transition: background 0.3s, color 0.3s;
+        }
+        button {
+        background: var(--button-bg);
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        font-size: 18px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.3s;
+        }
+        button:hover {
+        background: var(--button-hover);
+        }
+        .game-container {
+        margin-top: 50px;
+        color: var(--container-text);
+        }
+        input[type="number"] {
+        color: var(--input-text);
+        padding: 10px;
+        font-size: 18px;
+        width: 100px;
+        text-align: center;
+        background: var(--input-bg);
+        border: var(--input-border);
+        transition: background 0.3s, color 0.3s;
+        }
+        .row {
+        margin: 10px;
+        }
+        .row span {
+        font-size: 24px;
+        margin: 0 5px;
+        padding: 10px;
+        border-radius: 5px;
+        display: inline-block;
+        }
+        .correct {
+        background-color: green;
+        color: white;
+        }
+        .wrong {
+        background-color: red;
+        color: white;
+        }
+        .misplaced {
+        background-color: yellow;
+        color: black;
+        }
+        .attempts {
+        margin-top: 30px;
+        }
+        .message {
+        font-size: 24px;
+        margin-top: 20px;
+        font-weight: bold;
+        }
+        #retryButton {
+        display: none;
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 18px;
+        background-color: var(--button-bg);
+        color: white;
+        border: none;
+        cursor: pointer;
+        }
+        #retryButton:hover {
+        background-color: var(--button-hover);
+        }
+        .toggle-btn {
+        position: fixed;
+        left: 5px;
+        top: 5px;
+        width: 40px;
+        height: auto;
+        font-size: 36px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: var(--button-bg);
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: left 1s;
+        min-width: 40px;
+        max-width: 40px;
+        text-align: center;
+        z-index: 1100;
+        }
+        .sidebar .toggle-btn {
+        font-size: 20px;
+        background: var(--toggle-btn);
+        transition: left 0.3s;
+        }
+        .sidebar.open .toggle-btn {
+        left: 243px;
+        }
+        .sidebar {
+        position: fixed;
+        left: -238px;
+        top: 0;
+        width: 200px;
+        height: 100%;
+        background: var(--sidebar-bg);
+        color: var(--text-color);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: left 0.3s;
+        z-index: 1000;
+        overflow-y: auto;
+        }
+        .sidebar.open {
+        left: 0;
+        border-right: 2.7px solid var(--sidebar-border);
+        }
+        .sidebar ul {
+        list-style: none;
+        padding: 0;
+        width: 100%;
+        }
+        .sidebar a {
+        width: 100%;
+        text-align: left;
+        }
+        .sidebar button {
+        width: 100%;
+        padding: 10px;
+        background: var(--sidebar-button-bg);
+        color: white;
+        border: none;
+        text-align: center;
+        cursor: pointer;
+        transition: background 0.3s;
+        margin-bottom: 1.8px;
+        font-size: 16px;
+        border: 1.7px solid var(--sidebar-btn-border);
+        }
+        .sidebar button:hover {
+        background: var(--sidebar-button-hover);
+        }
+        .sidebar h2{
+        padding-bottom: 8px;
+        width: 100%;
+        margin-top: 1px; 
+        margin-bottom: 30px;
+        border-bottom: 3px solid var(--sidebar-btn-border);
+        }
+        .sidebar h3{
+        margin-top: 1px; 
+        margin-bottom: 0.01px;
+        }
+        .dark-mode-toggle {
+        position: fixed;
+        top: 5px;
+        right: 3.8px;
+        background: var(--dark-toggle-bg);
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        font-size: 18px;
+        border-radius: 5px;
+        cursor: pointer;
+        z-index: 1100;
+        transition: background 0.3s;
+        }
+        .dark-mode-toggle:hover {
+        background: var(--dark-toggle-hover);
+        }
+        .dark-mode-toggle.dark-mode {
+        background: var(--dark-toggle-bg);
+        color: white;
+        }
+        .dark-mode-toggle.dark-mode:hover {
+        background: #555;
+        }
+    </style>
+    </head>
+    <body>
+    <div class="game-container">
+        <h1>¡Adivina el Número!</h1>
+        <h4>Ingresa un número de 5 dígitos:</h4>
+        <input type="number" id="guessInput" maxlength="5" onkeydown="checkEnter(event)">
+        <h4 id="remainingAttempts">Intentos restantes: 6</h4>
+        <div class="attempts" id="attempts"></div>
+        <div class="message" id="message"></div>
+        <button id="retryButton" onclick="restartGame()">Volver a jugar</button>
+    </div>
+    <div class="sidebar" id="sidebar">
+        <button class="toggle-btn" onclick="toggleMenu()">☰</button>
+        <h2>Menú</h2>
+        <h3>Utilidades</h3>
+        <ul>
+        <a href="main.html"><button>Simplificación de Raíces</button></a>
+        <a><button>Simplificación de Fracciones</button></a>
+        </ul>
+        <h3>Teoría</h3>
+        <ul>
+        <a><button>Leyes de las raíces</button></a>
+        <a><button>Leyes de Fracciones</button></a>
+        </ul>
+        <h3>Juegos</h3>
+        <ul>
+        <a target="_blank" href="numberele.html"><button>Numberele</button></a>
+        <a><button>Quiz</button></a>
+        </ul>
+    </div>
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
+<script>
+        let targetNumber;
+        const maxAttempts = 6;
+        let attempts = 0;
+        function generateRandomNumber(digits) {
+        let number = '';
+        for (let i = 0; i < digits; i++) {
+            number += Math.floor(Math.random() * 10);
+        }
+        return number;
+        }
+        function startGame() {
+        targetNumber = generateRandomNumber(5);
+        attempts = 0;
+        document.getElementById('message').innerText = '';
+        document.getElementById('attempts').innerHTML = '';
+        document.getElementById('retryButton').style.display = 'none';
+        document.getElementById('guessInput').disabled = false;
+        document.getElementById('guessInput').value = '';
+        document.getElementById('remainingAttempts').innerText = `Intentos restantes: ${maxAttempts}`;
+        }
+        function submitGuess() {
+        const guess = document.getElementById('guessInput').value;
+        if (guess.length !== 5 || isNaN(guess)) {
+            alert("Por favor, ingresa un número válido de 5 dígitos.");
+            return;
+        }
+        attempts++;
+        const feedback = getFeedback(guess);
+        displayAttempt(guess, feedback);
+        document.getElementById('remainingAttempts').innerText = `Intentos restantes: ${maxAttempts - attempts}`;
+        document.getElementById('guessInput').value = '';
+        if (guess === targetNumber) {
+            document.getElementById('message').innerText = '¡Felicidades! Adivinaste el número.';
+            endGame();
+        } else if (attempts === maxAttempts) {
+            document.getElementById('message').innerText = `¡Perdiste! El número era: ${targetNumber}`;
+            endGame();
+        }
+        }
+        function checkEnter(event) {
+        if (event.key === 'Enter') {
+            submitGuess();
+        }
+        }
+        function getFeedback(guess) {
+        let feedback = [];
+        for (let i = 0; i < guess.length; i++) {
+            if (guess[i] === targetNumber[i]) {
+                feedback.push('correct');
+            } else if (targetNumber.includes(guess[i])) {
+                feedback.push('misplaced');
+            } else {
+                feedback.push('wrong');
+            }
+        }
+        return feedback;
+        }
+        function displayAttempt(guess, feedback) {
+        const attemptsDiv = document.getElementById('attempts');
+        const attemptRow = document.createElement('div');
+        attemptRow.classList.add('row');
+        for (let i = 0; i < guess.length; i++) {
+            const span = document.createElement('span');
+            span.textContent = guess[i];
+            span.classList.add(feedback[i]);
+            attemptRow.appendChild(span);
+        }
+        attemptsDiv.appendChild(attemptRow);
+        }
+        function endGame() {
+        document.getElementById('guessInput').disabled = true;
+        document.getElementById('retryButton').style.display = 'inline-block';
+        }
+        function restartGame() {
+        startGame();
+        }
+        window.onload = startGame; //hace que se puedan juagr varias veces
+        function toggleMenu() {
+        let sidebar = document.getElementById("sidebar");
+        let container = document.querySelector(".container");
+        sidebar.classList.toggle("open");
+        container.classList.toggle("shift");
+        }
+        function toggleDarkMode() {
+        document.body.classList.toggle("dark-mode");
+        }
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                simplificarFraccion();
+            }
+        });
+</script>
+
+</body>
+</html>
